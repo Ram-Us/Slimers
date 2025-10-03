@@ -8,7 +8,9 @@ using UnityEngine;
 public class SlimeController : MonoBehaviour
 {
 
-    private float jumpPower = 3f;
+    private float jumpPower = 3f;  
+    [SerializeField]
+    private float moveSpeed = 2f;
     //private float sideForce = 1f;
     private Rigidbody rb;
     private Animator anim;
@@ -16,34 +18,20 @@ public class SlimeController : MonoBehaviour
     //private bool isSquatting = false; // しゃがみ状態フラグ
     private Vector3 PresentPosition;
     private Vector3 PresentScale;
-    private Vector3 NowPosition;
     private Vector3 SquatScale;
-    private SkinnedMeshRenderer smr;
-    private Mesh mesh;
-    private int jumpIndex;
-    private int squashIndex;
+
     private bool squatInput = false;
+    private bool sideSquat = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         anim=GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         PresentPosition = new Vector3(0f, 3f, 0f);
-        PresentScale = new Vector3(20f, 20f, 0f);
-        SquatScale = new Vector3(12f, 10f, 7f);
+        PresentScale = new Vector3(15f, 15f, 15f);
+        SquatScale = new Vector3(46f, 15f, 6f);
         //Debug.Log(PresentPosition);
 
-        smr = GetComponentInChildren<SkinnedMeshRenderer>();
-        mesh = smr.sharedMesh;
-
-        // 名前一覧確認
-        //for (int i = 0; i < mesh.blendShapeCount; i++)
-            //Debug.Log("Blend " + i + ": " + mesh.GetBlendShapeName(i));
-
-        //jumpIndex = smr.sharedMesh.GetBlendShapeIndex("ジャンプ");
-        //squashIndex = smr.sharedMesh.GetBlendShapeIndex("しゃがむ");
-
-        //Debug.Log(jumpIndex + "," + squashIndex);
     }
 
     // Update is called once per frame
@@ -65,12 +53,17 @@ public class SlimeController : MonoBehaviour
         {
             Debug.Log("いまSquash中！");
         }*/
-        squatInput = Input.GetKey(KeyCode.DownArrow); // ↓を押してる間しゃがむ
+
+        float mouseX = Input.GetAxis("Mouse X");
+        Vector3 move = new Vector3(mouseX * moveSpeed * Time.fixedDeltaTime, 0, 0);
+        rb.MovePosition(rb.position + move);
+
+        squatInput = Input.GetMouseButton(1); // 右クリックを押してる間しゃがむ
         anim.SetBool("isSquatting", squatInput);
-        Debug.Log(squatInput);
+        //Debug.Log(squatInput);
         // ジャンプ
         //Debug.Log(isGrounded);
-        if (Input.GetKey(KeyCode.UpArrow) && isGrounded)
+        if (Input.GetMouseButton(0) && isGrounded)
         {
             anim.SetTrigger("Jump");
             rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
@@ -81,70 +74,36 @@ public class SlimeController : MonoBehaviour
         }
 
 
-        // ジャンプ
-        if (Input.GetKeyDown(KeyCode.DownArrow) && isGrounded)
+        //しゃがむ
+        if (Input.GetMouseButtonDown(1) && isGrounded)
         {
             anim.SetTrigger("Squash");
             Debug.Log("Down");
         }
-        if (Input.GetKeyUp(KeyCode.DownArrow))
+         if (Input.GetMouseButtonUp(1))
         {
             squatInput = false;
-        }/*
-      
-         // 右ジャンプ
-         if (Input.GetKeyDown(KeyCode.RightArrow) && isGrounded)
-         {
-             rb.AddForce(new Vector3(sideForce, jumpPower, 0f), ForceMode.Impulse);
-             isGrounded = false;
-         }
-         // 左ジャンプ
-         if (Input.GetKeyDown(KeyCode.LeftArrow) && isGrounded)
-         {
-             rb.AddForce(new Vector3(-sideForce, jumpPower, 0f), ForceMode.Impulse);
-             isGrounded = false;
-         }*/
-        // しゃがみ（押してる間ずっと）
-        /*if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            isSquatting = true;
-            // 縮んだ分だけ下に移動（接地させる）
-            float offset = (SquatScale.z - PresentScale.z) / 2f;
-            transform.position = PresentPosition - new Vector3(0, offset, 0);
+            /*if (sideSquat)
+            {
+                transform.localScale = Vector3.Lerp(SquatScale, PresentScale, 0.5f);
+                sideSquat = false;
+                Debug.Log("sideSquatをfalseにしたよ");
+            }*/
         }
-        else
-        {
-            isSquatting = false;
-            transform.position = PresentPosition;
-        }*/
-
-        // ▼スケール処理
-        /*if (!isGrounded)
-        {
-            
-        }
-        else
-        {
-            transform.localScale = Vector3.Lerp(
-                transform.localScale,
-                PresentScale,
-                Time.deltaTime * 10f
-            );
-        }*/
-
-
 
         /*if (Input.GetKey(KeyCode.RightArrow) && Input.GetKey(KeyCode.LeftArrow))
         {
-            transform.localScale = new Vector3(30f, 10f, 5f);
-        }
-        else if (Input.GetKey(KeyCode.UpArrow) && Input.GetKey(KeyCode.DownArrow))
-        {
-            transform.localScale = new Vector3(3f, 10f, 35f);
-            //transform.position = new Vector3(0f, 3.244f, 0f);
-        }*/
-        //transform.localScale = PresentScale;
-        //transform.position = PresentPosition;
+            Debug.Log("伸びたよ！！");
+            anim.SetTrigger("Squash");
+            transform.localScale = Vector3.Lerp(PresentScale, SquatScale, 0.5f);
+            sideSquat = true;
+            
+        }     */
+
+
+
+
+
 
 
     }
@@ -153,6 +112,7 @@ public class SlimeController : MonoBehaviour
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+            anim.ResetTrigger("Jump");
         }
         /*if (collision.gameObject.CompareTag("Wall"))
         {
