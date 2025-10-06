@@ -12,14 +12,17 @@ public class SlimeController : MonoBehaviour
     private float jumpPower = 2f;  
     [SerializeField]
     private float moveSpeed = 2f;
+    [SerializeField]
+    private float sideForce = 1f;
     //private float sideForce = 1f;
     private Rigidbody rb;
     private Animator anim;
     private bool isGrounded=true;
+    bool a;
+
+    AnimatorStateInfo stateInfo;
     //private bool isSquatting = false; // しゃがみ状態フラグ
-    private Vector3 PresentPosition;
-    private Vector3 PresentScale;
-    private Vector3 SquatScale;
+
 
 
 
@@ -29,9 +32,8 @@ public class SlimeController : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-        PresentPosition = new Vector3(0f, 3f, 0f);
-        PresentScale = new Vector3(12f, 12f, 12f);
-        SquatScale = new Vector3(46f, 15f, 6f);
+        
+
         
         //Debug.Log(PresentPosition);
 
@@ -42,18 +44,37 @@ public class SlimeController : MonoBehaviour
     
     void Update()
     {
+        stateInfo = anim.GetCurrentAnimatorStateInfo(0);
+        //a = Input.GetMouseButton(0);
+        //Debug.Log(stateInfo.fullPathHash);
+        //Debug.Log(a+" "+ isGrounded);
 
         float mouseX = Input.GetAxis("Mouse X");
         Vector3 move = new Vector3(mouseX * moveSpeed * Time.deltaTime, 0, 0);
         transform.position += move;
         squatInput = Input.anyKey; // 右クリックを押してる間しゃがむ
         anim.SetBool("Change", squatInput);
-   
+
         //Debug.Log(squatInput);
         // ジャンプ
         //Debug.Log(isGrounded);
-        if (Input.GetMouseButton(0) && isGrounded)
+        
+
+        if (stateInfo.IsName("Slime_HorizontalStretch") &&
+         Input.GetMouseButton(0) && isGrounded)
         {
+            anim.SetTrigger("Jump_Stretch");
+            Debug.Log("JumpStretch");
+        }
+        if (stateInfo.IsName("Slime_VerticalStretch") &&
+         Input.GetMouseButton(0) && isGrounded)
+        {
+            anim.SetTrigger("Jump_Stretch");
+            Debug.Log("JumpStretch2");
+        }
+        if (Input.GetMouseButtonDown(0) && isGrounded)
+        {
+
             anim.SetTrigger("Jump");
             rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
 
@@ -79,10 +100,26 @@ public class SlimeController : MonoBehaviour
         //縦伸び
         if (Input.GetKeyDown(KeyCode.S) && isGrounded)
         {
-            rb.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
             anim.SetTrigger("VerticalStretch");
             Debug.Log("tatenobin");
         }
+        if (Input.GetKeyDown(KeyCode.A) && isGrounded)
+        {
+            anim.SetTrigger("LeftJump");
+            rb.AddForce(new Vector3(-sideForce, jumpPower, 0f), ForceMode.Impulse);
+            isGrounded = false;
+            Debug.Log("migtobi");
+        }
+        if (Input.GetKeyDown(KeyCode.D) && isGrounded)
+        {
+            anim.SetTrigger("RightJump");
+            rb.AddForce(new Vector3(sideForce, jumpPower, 0f), ForceMode.Impulse);
+            isGrounded = false;
+            Debug.Log("hidaritobi");
+        }
+
+        
+
 
         if (Input.GetMouseButtonUp(1) || Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.S))
         {
@@ -113,10 +150,14 @@ public class SlimeController : MonoBehaviour
     }
     void OnCollisionEnter(Collision collision)
     {
+
+        //Debug.Log(a+" "+ isGrounded);
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
             anim.ResetTrigger("Jump");
+            anim.ResetTrigger("RightJump");
+            anim.ResetTrigger("LeftJump");
         }
         /*if (collision.gameObject.CompareTag("Wall"))
         {
