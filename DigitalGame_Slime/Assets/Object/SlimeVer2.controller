@@ -110,7 +110,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Slime_HorizontalStrech_Back
+  m_Name: Slime_HorizontalStretch_Back
   m_Speed: 3
   m_CycleOffset: 0
   m_Transitions:
@@ -267,7 +267,7 @@ AnimatorState:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Slime_Back
-  m_Speed: 3
+  m_Speed: 2
   m_CycleOffset: 0
   m_Transitions:
   - {fileID: -344936540375378644}
@@ -379,9 +379,9 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.21239763
-  m_TransitionOffset: 0.36097562
-  m_ExitTime: 0.53320175
+  m_TransitionDuration: 0.077014804
+  m_TransitionOffset: 0.7562772
+  m_ExitTime: 0.9918958
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
@@ -476,9 +476,9 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.015020788
-  m_TransitionOffset: 0
-  m_ExitTime: 0.9792285
+  m_TransitionDuration: 0.40501177
+  m_TransitionOffset: 0.0085064825
+  m_ExitTime: 1.0047325
   m_HasExitTime: 1
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
