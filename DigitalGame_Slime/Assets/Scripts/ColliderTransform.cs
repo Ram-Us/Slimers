@@ -14,8 +14,8 @@ public class ColliderTransform : MonoBehaviour
     Vector3 SquashCenter = new Vector3(0,0,0.003f);
     Vector3 HorizontalSize = new Vector3(-0.025f,0.07f,-0.009f);
     Vector3 HorizontalCenter = new Vector3(0,0,0.004f);
-    Vector3 VerticalSize = new Vector3(-0.025f,0.025f,0.057f);
-    Vector3 VerticalCenter = new Vector3(0,0,0.027f);
+    Vector3 VerticalSize = new Vector3(-0.02f,0.01f,0.057f);
+    Vector3 VerticalCenter = new Vector3(0.007f,0,0.025f);
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -51,8 +51,8 @@ public class ColliderTransform : MonoBehaviour
         }
         if (stateInfo.IsName("Slime_VerticalStretch"))
         {
-            box.size = Vector3.Lerp(box.size, VerticalSize, 0.3f);
-            box.center = Vector3.Lerp(box.center, VerticalCenter, 0.3f);
+            box.size = Vector3.Lerp(box.size, VerticalSize, 0.4f);
+            box.center = Vector3.Lerp(box.center, VerticalCenter, 0.4f);
             //Debug.Log(box.size + "縦伸びコリだー" + box.center);
         }
         if (stateInfo.IsName("Slime_Idle")||stateInfo.IsName("Slime_Back")||stateInfo.IsName("Slime_HorizontalStretch_Back")|| stateInfo.IsName("Slime_VerticalStretch_Back"))

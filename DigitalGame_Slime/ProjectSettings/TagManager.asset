@@ -7,6 +7,8 @@ TagManager:
   - Ground
   - Wall
   - Block
+  - Slope
+  - Fall
   layers:
   - Default
   - TransparentFX
