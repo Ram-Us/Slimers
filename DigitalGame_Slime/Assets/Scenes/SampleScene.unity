@@ -3951,6 +3951,7 @@ GameObject:
   - component: {fileID: 715996803}
   - component: {fileID: 715996802}
   - component: {fileID: 715996805}
+  - component: {fileID: 715996806}
   m_Layer: 0
   m_Name: Camera
   m_TagString: Untagged
@@ -4088,6 +4089,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 892227905999aef45b2fce0815b2314d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &715996806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 715996800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c03f50cd2c592f449e399e20183b9b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 8912282649327657918}
 --- !u!4 &725240507 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7337625479700659905, guid: 6c31288a55d1c7c47988898f6565c70d, type: 3}
@@ -6677,7 +6691,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  - {fileID: 2100000, guid: a1d86eb16cb5ac641b241af4b14c6c65, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -8552,7 +8566,7 @@ MeshCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 5
-  m_Convex: 0
+  m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -5495902117074765545, guid: d870e891115851b4dae17ff1e68d8f89, type: 3}
 --- !u!1001 &3555846684018269908
@@ -8829,7 +8843,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9082547191837500780, guid: ca8c9018ae067cf41a39ac0e15d84d83, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 74.06
+      value: 73.5
       objectReference: {fileID: 0}
     - target: {fileID: 9082547191837500780, guid: ca8c9018ae067cf41a39ac0e15d84d83, type: 3}
       propertyPath: m_LocalRotation.w
@@ -8948,20 +8962,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3792c0b3038987847b298bdee3e474ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpPower: 3
+  jumpPower: 3.5
   moveSpeed: 1
   sideForce: 1
   slideForce: 5
-  slideSpeed: 2
+  slideSpeed: 5
   slopeStopAngle: 10
   slideFriction: 0.98
   minSlideSpeed: 0.05
-  PresentCameraTransform: {x: 0.0815, y: 0.0007, z: 0.033}
-  PresentCameraoffset: {x: 0, y: 0, z: 0}
-  MovingCameraTransform: {x: 0.082, y: 0.001, z: 0.066}
-  MovingCameraoffset: {x: 0.000010245284, y: 250.32439, z: 270}
-  smoothSpeed: 0.125
-  MainCamera: {fileID: 715996804}
 --- !u!54 &8912282649327657928
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -17,8 +17,10 @@ public class SlimeController : MonoBehaviour
 
     [SerializeField]
     private float sideForce = 1f;
-    float moveZ = 2f;
+    private float moveX;
+    private float moveZ;
     [SerializeField] private float slideForce = 5f;
+    public float MoveX => moveX;
     public float MoveZ => moveZ;
     //private float sideForce = 1f;
     private Rigidbody rb;
@@ -27,7 +29,7 @@ public class SlimeController : MonoBehaviour
     private bool isMoved_Right = false;
     private bool isMoved_Left = false;
     private bool isSliding = false;
-    [SerializeField] private float slideSpeed = 10f;
+    [SerializeField] private float slideSpeed = 50f;
     //UnityEditor.TransformWorldPlacementJSON:{"position":{"x":0.270501820966720581},"scale":{"x":0.08333331346511841,"y":0.08333331346511841,"z":0.08333331346511841}}9414424896,"y":5.71790075302124,"z":79.584228515625},"rotation":{"x":0.16977959871292115,"y":0.0,"z":0.0,"w":0.9854
 
     private Vector3 slideDirection;
@@ -37,21 +39,14 @@ public class SlimeController : MonoBehaviour
     [SerializeField] private float slideFriction = 0.90f; // 滑り速度の減衰係数（毎FixedUpdate）
     [SerializeField] private float minSlideSpeed = 0.05f; // これ以下になったら滑りを止める
     private float currentSlideSpeed;
-    private float baseSlideSpeed;
     private bool isFinished = true;
 
     AnimatorStateInfo stateInfo;
     //private bool isSquatting = false; // しゃがみ状態フラグ
     private bool squatInput = false;
 
-    private Vector3 PresentCameraTransform = new Vector3(0.0815f, 0.00069f, 0.032f);
-    private Vector3 PresentCameraoffset = new Vector3(0, -94.71f, -90f);//オイラー角
-    private Vector3 MovingCameraTransform = new Vector3(0.082f,0.001f,0.06f);
-    private Vector3 MovingCameraoffset = new Vector3(1.02f,250.3f,270f);//オイラー角
-    [SerializeField] private float smoothSpeed = 0.125f;
-    [SerializeField] private Camera MainCamera;
-    private Vector3 preLocal;
-    private Vector3 moveLocal;
+    //[SerializeField] private Camera MainCamera;
+
 
     private Vector3 PresentPosition;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -59,16 +54,11 @@ public class SlimeController : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
-        baseSlideSpeed = slideSpeed;
-        currentSlideSpeed = baseSlideSpeed;
+        Cursor.visible = false;
         
-        MainCamera.transform.localPosition = PresentCameraTransform;
-        MainCamera.transform.localEulerAngles = PresentCameraoffset;
-        preLocal = PresentCameraoffset;
-        moveLocal = MovingCameraoffset;
+
 
         //localRotaionはQuaternionで管理されているので、eulerAnglesで確認可能
-        Debug.Log("Before" + MainCamera.transform.localRotation + " " + MainCamera.transform.localEulerAngles + " "+PresentCameraoffset);
         //Debug.Log(PresentPosition);
 
     }
@@ -76,8 +66,7 @@ public class SlimeController : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        float moveX = Input.GetAxis("Horizontal"); // A(-1) ～ D(+1)
-        float moveZ = Input.GetAxis("Vertical");   // S(-1) ～ W(+1)
+
         
         // 滑っているときは滑り専用の処理（速度を減衰させつつ移動）
          // 移動方向をベクトルで作成
@@ -102,30 +91,22 @@ public class SlimeController : MonoBehaviour
          // Rigidbodyを使って移動（物理演算対応）
          
 
-         if (isSliding)
-         {
-            // 重力を加える
-            Vector3 gravity = Physics.gravity; // Unityの重力を取得
-            rb.AddForce(gravity * 0.5f, ForceMode.Acceleration); // 重力をスケールして加える
-
-            // 滑り方向に速度を加える
-            rb.MovePosition(transform.position + slideDirection * currentSlideSpeed * Time.deltaTime);
-
-            // 滑り速度を減衰
-            currentSlideSpeed *= slideFriction;
-            Debug.Log(currentSlideSpeed);
-
-            if (currentSlideSpeed < minSlideSpeed)
-            {
-                isSliding = false;
-                currentSlideSpeed = baseSlideSpeed;
-                Debug.Log("滑りが減衰して終了しました");
-            }
-         }
-         else
+         // 通常移動
+        
+        
+        moveX = Input.GetAxis("Horizontal");
+        moveZ = Input.GetAxis("Vertical");
+        moveDir = new Vector3(moveX, 0, moveZ);
+        
+        
+        if (isSliding)
         {
-             transform.position += moveDir * moveSpeed * Time.deltaTime;
-         }
+            // 坂を一定速度で滑る
+            //rb.MovePosition(transform.position + slideDirection * slideSpeed * Time.deltaTime);
+            transform.position += (moveDir * moveSpeed * 5 + slideDirection * slideSpeed)* Time.deltaTime;
+        }else{
+            transform.position += moveDir * moveSpeed * Time.deltaTime;
+        }
      }
 
     void Update()
@@ -280,16 +261,17 @@ public class SlimeController : MonoBehaviour
         }
         if (collision.gameObject.CompareTag("Slope") && isFinished)
         {
-            Debug.Log("Before" + MainCamera.transform.localPosition + " " + MainCamera.transform.localEulerAngles);
-            MainCamera.transform.position = Vector3.Lerp(PresentCameraTransform, MovingCameraTransform, smoothSpeed);
-            MainCamera.transform.rotation = Quaternion.Euler(Vector3.Lerp(PresentCameraoffset, MovingCameraoffset, smoothSpeed));
-            Debug.Log("After" + MainCamera.transform.localPosition + " " + MainCamera.transform.localEulerAngles);
+           
+            ContactPoint contact = collision.contacts[0];
+            Vector3 normal = contact.normal;
 
-            // 坂に乗ったら滑り開始。滑り速度をリセット
+            // 坂の下方向を求める
+            slideDirection = Vector3.Cross(Vector3.Cross(normal, Vector3.down), normal).normalized;
+
             isSliding = true;
-            currentSlideSpeed = baseSlideSpeed*3f; // 初期速度を3倍に
+            isGrounded = true;
             anim.SetTrigger("Slope");
-            anim.SetBool("Change_Slope", isSliding);
+            anim.SetBool("Change_Slope", true);
             Debug.Log("Slopeに乗ったよ (滑り開始)");
         }
 
@@ -299,46 +281,28 @@ public class SlimeController : MonoBehaviour
         }*/
     }
 
-    void OnCollisionStay(Collision collision)
+   void OnCollisionStay(Collision collision)
     {
+        // 坂に接触している間は滑り続ける
         if (collision.gameObject.CompareTag("Slope"))
         {
-
-            
-            // 坂の法線から滑る方向を計算（重力方向に沿って）
-            ContactPoint contact = collision.contacts[0];
-            Vector3 normal = contact.normal;
-
-            // 坂の下方向（＝接地面の傾きに沿った重力方向）
-            slideDirection = Vector3.Cross(Vector3.Cross(normal, Vector3.down), normal).normalized;
             isSliding = true;
-            anim.SetBool("Change_Slope", isSliding);
-            // 追加: 接触法線から傾斜角を計算し、十分に平らになったら滑り終了
-            float slopeAngle = Vector3.Angle(normal, Vector3.up);
-            if (slopeAngle < slopeStopAngle)
-            {
-                isSliding = false;
-                currentSlideSpeed = baseSlideSpeed;
-                anim.SetBool("Change_Slope", isSliding);
-                Debug.Log($"Slopeが平らになったので滑り終了 (angle={slopeAngle:F1})");
-            }
+            anim.SetBool("Change_Slope", true);
         }
-            
     }
+
     void OnCollisionExit(Collision collision)
     {
+        // 坂から離れたら滑りを終了（空中に出た場合）
         if (collision.gameObject.CompareTag("Slope"))
         {
-            Debug.Log("Before" + MainCamera.transform.localPosition + " " + MainCamera.transform.localEulerAngles);
-            MainCamera.transform.position = Vector3.Lerp(MovingCameraTransform, PresentCameraTransform, smoothSpeed);
-            MainCamera.transform.rotation = Quaternion.Euler(Vector3.Lerp(MovingCameraoffset, PresentCameraoffset, smoothSpeed));
             isSliding = false;
-            anim.SetBool("Change_Slope", isSliding);
-            Debug.Log("Slopeから離れたよ");
-            Debug.Log("After" + MainCamera.transform.localPosition + " " + MainCamera.transform.localEulerAngles);
+            anim.SetBool("Change_Slope", false);
+            Debug.Log("Slopeから離れた → 滑り終了");
         }
-            
     }
+            
+    
 
 
     
