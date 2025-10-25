@@ -13,7 +13,9 @@ public class WalkingSpace : MonoBehaviour
     [SerializeField] private float speed = 2f;
 
     private Vector3 target;
-    private bool isMoving = false;
+    [SerializeField] private bool isMoving = false;
+
+    public bool IsMoving => isMoving;
     private bool reachedEnd = false;
     private GameObject player;
 
@@ -39,6 +41,7 @@ public class WalkingSpace : MonoBehaviour
                 Debug.Log("足場が終点に到達し、停止しました");
             }
         }
+        //Debug.Log("これはWalkingSpce"+isMoving);
     }
 
     void OnCollisionEnter(Collision collision)
@@ -71,5 +74,12 @@ public class WalkingSpace : MonoBehaviour
         Gizmos.DrawWireSphere(pointA, 0.05f);
         Gizmos.DrawWireSphere(pointB, 0.05f);
         Gizmos.DrawLine(pointA, pointB);
+    }
+
+    public void PositionReset()
+    {
+        transform.position = pointA;
+        isMoving = false;
+        Debug.Log("リセットッ！");
     }
 }
