@@ -41,9 +41,12 @@ public class SlimeController : MonoBehaviour
     private float currentSlideSpeed;
     private bool isFinished = true;
 
+    private Vector3 moveDir,moveSlp;
     AnimatorStateInfo stateInfo;
     //private bool isSquatting = false; // しゃがみ状態フラグ
     private bool squatInput = false;
+    [SerializeField] private WalkingSpace walkingSpace;
+    [SerializeField] private Transform point;
 
     //[SerializeField] private Camera MainCamera;
 
@@ -55,6 +58,7 @@ public class SlimeController : MonoBehaviour
         anim = GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         Cursor.visible = false;
+        PresentPosition = this.transform.position;
         
 
 
@@ -67,10 +71,11 @@ public class SlimeController : MonoBehaviour
     void FixedUpdate()
     {
 
-        
+
         // 滑っているときは滑り専用の処理（速度を減衰させつつ移動）
-         // 移動方向をベクトルで作成
-         Vector3 moveDir = new Vector3(moveX, 0, moveZ);
+        // 移動方向をベクトルで作成
+        moveDir = new Vector3(moveX, 0, moveZ);
+        moveSlp = new Vector3(moveX, 0, 0);
          if (moveX > 0)
          {
              isMoved_Right = true;
@@ -97,16 +102,21 @@ public class SlimeController : MonoBehaviour
         moveX = Input.GetAxis("Horizontal");
         moveZ = Input.GetAxis("Vertical");
         moveDir = new Vector3(moveX, 0, moveZ);
-        
-        
+
+
+
         if (isSliding)
         {
             // 坂を一定速度で滑る
             //rb.MovePosition(transform.position + slideDirection * slideSpeed * Time.deltaTime);
-            transform.position += (moveDir * moveSpeed * 5 + slideDirection * slideSpeed)* Time.deltaTime;
-        }else{
+            moveSpeed = 0.5f;
+            transform.position += (moveSlp * moveSpeed * 5 + slideDirection * slideSpeed) * Time.deltaTime;
+        }
+        else
+        {
             transform.position += moveDir * moveSpeed * Time.deltaTime;
         }
+        //Debug.Log("これはSlimeController"+walkingSpace.IsMoving);
      }
 
     void Update()
@@ -238,30 +248,35 @@ public class SlimeController : MonoBehaviour
     }
     void OnCollisionEnter(Collision collision)
     {
-       
+
 
         //Debug.Log(a+" "+ isGrounded);
-        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Space"))
+        if (collision.gameObject.CompareTag("Ground") )
         {
 
             isGrounded = true;
             anim.ResetTrigger("Jump");
             anim.ResetTrigger("RightJump");
             anim.ResetTrigger("LeftJump");
-            PresentPosition = this.transform.position;
         }
         if (collision.gameObject.CompareTag("Block"))
         {
-            this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - 2f);
+            this.transform.position = point.position;
         }
         if (collision.gameObject.CompareTag("Fall"))
         {
-            transform.position = new Vector3(PresentPosition.x, PresentPosition.y + 2f, PresentPosition.z);
+            transform.position = new Vector3(PresentPosition.x, PresentPosition.y, PresentPosition.z);
+            if (walkingSpace.IsMoving)
+            {
+                walkingSpace.PositionReset();
+            }
             
+            
+
         }
         if (collision.gameObject.CompareTag("Slope") && isFinished)
         {
-           
+
             ContactPoint contact = collision.contacts[0];
             Vector3 normal = contact.normal;
 
@@ -270,24 +285,38 @@ public class SlimeController : MonoBehaviour
 
             isSliding = true;
             isGrounded = true;
-            anim.SetTrigger("Slope");
-            anim.SetBool("Change_Slope", true);
+            //anim.SetTrigger("Slope");
+            //anim.SetBool("Change_Slope", true);
             Debug.Log("Slopeに乗ったよ (滑り開始)");
         }
+
 
         /*if (collision.gameObject.CompareTag("Wall"))
         {
             transform.position = PresentPosition;
         }*/
     }
+    private void OnTriggerEnter(Collider other) {
 
-   void OnCollisionStay(Collision collision)
+        if (other.gameObject.CompareTag("Middle"))
+        {
+            PresentPosition = this.transform.position;
+            Debug.Log("中間ポイント");
+        }
+        if(other.gameObject.CompareTag("Coin")){
+            GameManager.Instance.AddScore(10);
+            Destroy(other.gameObject);
+        }
+       
+    }
+
+    void OnCollisionStay(Collision collision)
     {
         // 坂に接触している間は滑り続ける
         if (collision.gameObject.CompareTag("Slope"))
         {
             isSliding = true;
-            anim.SetBool("Change_Slope", true);
+            //anim.SetBool("Change_Slope", true);
         }
     }
 
@@ -297,7 +326,7 @@ public class SlimeController : MonoBehaviour
         if (collision.gameObject.CompareTag("Slope"))
         {
             isSliding = false;
-            anim.SetBool("Change_Slope", false);
+            //anim.SetBool("Change_Slope", false);
             Debug.Log("Slopeから離れた → 滑り終了");
         }
     }

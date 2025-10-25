@@ -22,14 +22,15 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: PowerUpSlime_Material 1
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_Parent: {fileID: 2100000, guid: 35f3ebbf66fecbe4dabc5b4269be3be8, type: 2}
+  m_Parent: {fileID: 2100000, guid: fc1356e564ccb0b4e923d0cbdc36bddc, type: 2}
   m_ModifiedSerializedProperties: 2
   m_ValidKeywords:
   - _EMISSION
   - _RECEIVE_SHADOWS_OFF
   - _SPECULAR_SETUP
   - _SURFACE_TYPE_TRANSPARENT
-  m_InvalidKeywords: []
+  m_InvalidKeywords:
+  - _SUNDISK_HIGH_QUALITY
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -37,9 +38,9 @@ Material:
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses:
-  - SHADOWCASTER
-  - DepthOnly
   - MOTIONVECTORS
+  - DepthOnly
+  - SHADOWCASTER
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
