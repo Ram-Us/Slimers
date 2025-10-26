@@ -22,7 +22,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: PowerUpSlime_Material 1
   m_Shader: {fileID: 4800000, guid: 933532a4fcc9baf4fa0491de14d08ed7, type: 3}
-  m_Parent: {fileID: 2100000, guid: fc1356e564ccb0b4e923d0cbdc36bddc, type: 2}
+  m_Parent: {fileID: 2100000, guid: 95c0cda455aaf244f9a5b64935e8a4a9, type: 2}
   m_ModifiedSerializedProperties: 2
   m_ValidKeywords:
   - _EMISSION
